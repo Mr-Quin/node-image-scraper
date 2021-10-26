@@ -9,6 +9,15 @@ app.use(express.urlencoded({ extended: true })).use(express.json())
 const imageRegex = /(?<=\.)(png|jpe?g|gif|svg)$/
 const parensRegex = /^((?!\().)*$/
 
+const tryCatch = async (action) => {
+    try {
+        const result = await action()
+        return [result, null]
+    } catch (error) {
+        return [null, error]
+    }
+}
+
 const isImage = (link) => {
     // Return false if there is no href attribute.
     if (typeof link === 'undefined') return false
@@ -21,14 +30,28 @@ const noParens = (link) => {
 }
 
 const scrape = async (url) => {
-    const response = await got(url)
-    const dom = new JSDOM(response.body)
+    const { origin } = new URL(url)
 
-    // Create an Array out of the HTML Elements for filtering using spread syntax.
+    const [response, err] = await tryCatch(async () => {
+        const request = got(url, {
+            headers: {
+                'User-Agent':
+                    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36',
+                Referer: origin,
+            },
+        })
+        return await request
+    })
+
+    if (err) return err
+
+    const dom = new JSDOM(response.body, {
+        url: url,
+        referrer: origin,
+    })
+
     const nodeList = dom.window.document.querySelectorAll('img')
     const nodeArray = [...nodeList]
-
-    console.log(nodeList)
 
     return nodeArray
         .map((link) => {
