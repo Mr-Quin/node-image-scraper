@@ -93,12 +93,11 @@ const scrapePage = async (url) => {
         await page.waitForTimeout(1000)
 
         const screenshot = await page.screenshot({ encoding: 'base64', type: 'jpeg' })
-        const imageNodes = await page.evaluate(() => document.querySelectorAll('img'))
+        const images  = await page.$$eval('img', (imgs) => imgs.map((img) => img.getAttribute('src')))        
 
-        console.debug(imageNodes)
-
-        const imageArray = Array.from(imageNodes).map((node) => {
-            return new URL(node.src, url).href
+        // remove duplicates from images
+        const imageArray = [...new Set(images)].map((img) => {
+            return new URL(img, url).href
         })
         // .filter(isImage)
         // .filter(noParens)
@@ -125,8 +124,9 @@ app.use(express.urlencoded({ extended: true }))
 
 const entry = async (req, res) => {
     const { url } = req.body
+    console.log(url);
     const scraper = await scrapePage(url)
-    const [scrapedData, error] = await tryCatch(scraper.get)
+    const [scrapedData, error] = await tryCatch(scraper.get, scraper.destroy)
 
     if (error) return res.status(400).json({ msg: error.message })
 
