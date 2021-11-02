@@ -4,7 +4,7 @@ This API scrapes a given website for images and metadata.
 
 It does the following things in order:
 
-1. opens the webbsite in a headless Chromium browser
+1. opens the website in a headless Chromium browser
 2. wait up to 5 seconds for an `<img>` tag to load
 3. attempts to find all `<img>` tags in the page and extract the `src` attribute
 4. ignore non-url `src` attributes such as base64 encoded images for data usage reasons, 
@@ -16,12 +16,11 @@ It does the following things in order:
 ## Limitations
 
 * only `<img>` tags will be considered
-    * other images, such as css backgrounds, will not be ignored
+    * other images, such as css backgrounds, will be ignored
 * only considers what's loaded on the page when the first `<img>` tag loads
     * this means if the website continuously loads new images, only the first one (or few) will be considered
+    * if the website does not contain an `<img>` tag, it will wait the whole duration
 * can contain a massive amount of images
-* if the website does not contain an `<img>` tag, it will wait the whole 5 seconds
-    * if it does, it will only wait until the first `<img>` tag loads
 * screenshot is base64 encoded because the service has no data storage backend to host images
 * in general, image scraping is not as reliable as metadata extraction
 
@@ -79,7 +78,7 @@ Scraping Github homepage using Python and `requests`
 import requests
 import json
 
-url = "http://localhost:3000"
+url = "some url"
 
 payload = json.dumps({
   "url": "https://github.com"
