@@ -11,7 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "express": "^4.17.1",
-    "got": "^11.8.2",
-    "jsdom": "^18.0.0"
+    "link-preview-js": "^2.1.8",
+    "puppeteer": "^10.4.0"
   }
 }
