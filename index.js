@@ -1,28 +1,16 @@
-const express = require('express')
+import express from 'express'
+import puppeteer from 'puppeteer'
+import { getLinkPreview } from 'link-preview-js'
+import { PUPPETEER_OPTIONS } from './config.js'
+
 const app = express()
 const port = process.env.PORT || 3000
-const puppeteer = require('puppeteer')
-const { getLinkPreview } = require('link-preview-js')
 
-const PUPPETEER_OPTIONS = {
-    headless: false,
-    args: [
-        '--disable-gpu',
-        '--disable-dev-shm-usage',
-        '--disable-setuid-sandbox',
-        '--timeout=30000',
-        '--no-first-run',
-        '--no-sandbox',
-        '--no-zygote',
-        '--single-process',
-        "--proxy-server='direct://'",
-        '--proxy-bypass-list=*',
-        '--deterministic-fetch',
-    ],
-}
 
 const openConnection = async () => {
     const browser = await puppeteer.launch(PUPPETEER_OPTIONS)
+
+    console.log('setting page');
     const page = await browser.newPage()
     await page.setUserAgent(
         'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36'
@@ -40,14 +28,12 @@ const sleep = async (ms) => {
     return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
-const imageRegex = /(?<=\.)(png|jpe?g|gif|svg)$/
-const parensRegex = /^((?!\().)*$/
-
 const tryCatch = async (action, onError) => {
     try {
         const result = await action()
         return [result, null]
     } catch (error) {
+        console.error(error)
         if (onError) {
             await onError(error)
         }
@@ -66,34 +52,46 @@ const noParens = (link) => {
     return parensRegex.test(link)
 }
 
-const allowPost = (req, res, next) => {
-    if (req.method !== 'POST') {
-        return res.status(400).json({ msg: 'only post requests allowed' })
-    }
-    next()
-}
+
 
 const getMeta = async (url) => {
     return getLinkPreview(url, { headers: { 'User-Agent': 'googlebot', timeout: 1000 } })
 }
 
 const scrapePage = async (url) => {
+    console.log('openning browser');
     const { page, browser } = await openConnection()
+    console.log('browser opened');
+
+    let destroyed = false
 
     const destroy = async () => {
+        console.log('closing browser');
+        if (destroyed) return
+        destroyed = true
         await closeConnection(page, browser)
     }
 
     const get = async () => {
+        console.log(`navigating to ${url}`);
+
         await page.goto(url, { waitUntil: 'load' })
+
+        console.log(`page loaded`);
+        console.log('waiting for images');
+
         const [selectorResult, err] = await tryCatch(() =>
             page.waitForSelector('img', { timeout: 4000 })
         )
         // wait an extra second for more images
         await page.waitForTimeout(1000)
 
+        console.log('screenshotting page');
+
         const screenshot = await page.screenshot({ encoding: 'base64', type: 'jpeg' })
         const images  = await page.$$eval('img', (imgs) => imgs.map((img) => img.getAttribute('src')))        
+
+        console.log('screenshot taken');
 
         // remove duplicates from images
         const imageArray = [...new Set(images)].map((img) => {
@@ -103,6 +101,8 @@ const scrapePage = async (url) => {
         // .filter(noParens)
 
         await destroy()
+
+        console.log('success');
 
         return { scrapedImages: imageArray, screenshot:`data:image/png;base64,${screenshot}` }
     }
@@ -118,13 +118,21 @@ const checkUrl = (req, res, next) => {
     next()
 }
 
+const allowPost = (req, res, next) => {
+    if (req.method !== 'POST') {
+        return res.status(400).json({ msg: 'only post requests allowed' })
+    }
+    next()
+}
+
 app.use(express.urlencoded({ extended: true }))
     .use(express.json())
     .use(allowPost)
 
 const entry = async (req, res) => {
     const { url } = req.body
-    console.log(url);
+    console.log(`Received ${url}`);
+    console.log('starting scraper');
     const scraper = await scrapePage(url)
     const [scrapedData, error] = await tryCatch(scraper.get, scraper.destroy)
 
