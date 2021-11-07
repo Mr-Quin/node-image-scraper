@@ -92,6 +92,9 @@ response = requests.request("POST", url, headers=headers, data=payload)
 
 **Response:**
 
+<details>
+    <summary>Response body</summary>
+
 ```json
 {
     "data": {
@@ -199,6 +202,8 @@ response = requests.request("POST", url, headers=headers, data=payload)
     "msg": "success"
 }
 ```
+</details>
+
 
 The base64 encoded screenshot:
 ![screenshot](./screenshot.png)
