@@ -17,6 +17,7 @@ It does the following things in order:
 
 * only `<img>` tags will be considered
     * other images, such as css backgrounds, will be ignored
+    * `<img>` tags with 'src' that is not an image url will be ignored
 * only considers what's loaded on the page when the first `<img>` tag loads
     * this means if the website continuously loads new images, only the first one (or few) will be considered
     * if the website does not contain an `<img>` tag, it will wait the whole duration
@@ -32,10 +33,18 @@ The API only needs the target website's URL, keyed by `url`.
 
 Accepts `application/json` and `application/x-www-form-urlencoded` content types.
 
+The request body has following properties:
+
+| property    | type     | required | explanation                                                                  |
+|-------------|----------|----------|-----------------------------------------------------------------------------------|
+| url         | string   | yes      | the target website to scrape. _must start with http:// or https://_               |
+| scrapeImages| string   | no       | a string "true" or "false", default "false". Determines whether to scrape images or not. Disabling this option can speed up the query. When this is disabled, the "scrapedImages" property of the response data will be an empty array           |
+
 Example request body:
 ```json
 {
-    "url": "some url"
+    "url": "some url",
+    "scrapeImages": "true"
 }
 ```
 
