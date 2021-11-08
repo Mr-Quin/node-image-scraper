@@ -38,7 +38,7 @@ The request body has following properties:
 | property    | type     | required | explanation                                                                  |
 |-------------|----------|----------|-----------------------------------------------------------------------------------|
 | url         | string   | yes      | the target website to scrape. _must start with http:// or https://_               |
-| scrapeImages| string   | no       | a string "true" or "false", default "false". Determines whether to scrape images or not. Disabling this option can speed up the query. When this is disabled, the "scrapedImages" property of the response data will be an empty array           |
+| scrapeImages| string   | no       | a boolean value, default `false`. Determines whether to scrape images or not. Disabling this option can speed up the query. When this is disabled, the "scrapedImages" property of the response data will be an empty array           |
 
 Example request body:
 ```json
@@ -85,21 +85,28 @@ Scraping Github homepage using Python and `requests`
 
 **Request:**
 
+<details>
+    <summary>Python Requests</summary>
+    
 ```python
 import requests
 import json
 
-url = "some url"
+url = "http://..."
 
 payload = json.dumps({
-  "url": "https://github.com"
+  "url": "https://github.com",
+  "scrapeImages": True
 })
 headers = {
   'Content-Type': 'application/json'
 }
 
 response = requests.request("POST", url, headers=headers, data=payload)
+
+print(response.text)
 ```
+</details>
 
 **Response:**
 
