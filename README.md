@@ -50,6 +50,8 @@ Example request body:
 
 **Response:** 
 
+Expect a few seconds of wait time before the response is sent.
+
 Content type is `application/json`.
 
 Response body has the following properties:
@@ -107,23 +109,19 @@ response = requests.request("POST", url, headers=headers, data=payload)
 ```json
 {
     "data": {
+        "screenshot": "data:image/png;base64,....",        
         "scrapedImages": [
-            "https://github.com/",
             "https://github.githubassets.com/images/modules/site/home/globe.jpg",
             "https://github.githubassets.com/images/modules/site/home/hero-glow.svg",
             "https://github.githubassets.com/images/modules/site/home/astro-mona.svg",
             "https://github.githubassets.com/images/modules/site/home/globe/pull-request-icon.svg",
             "https://github.githubassets.com/images/modules/site/home/globe/north-star.svg",
             "https://github.githubassets.com/images/modules/site/home/enterprise-city-w-logos.jpg",
-            "https://avatars.githubusercontent.com/jasonetco?s=64&v=4",
             "https://github.githubassets.com/images/modules/site/home/repo-browser.png",
             "https://github.githubassets.com/images/modules/site/home/icons/folder.svg",
             "https://github.githubassets.com/images/modules/site/home/icons/file.svg",
             "https://github.githubassets.com/images/modules/site/home/repo-editor-glow.svg",
             "https://github.githubassets.com/images/modules/site/home/repo-terminal-glow.svg",
-            "https://avatars.githubusercontent.com/nplasterer?s=64&v=4",
-            "https://avatars.githubusercontent.com/ampinsk?s=64&v=4",
-            "https://avatars.githubusercontent.com/joshaber?s=64&v=4",
             "https://github.githubassets.com/images/modules/site/home/pr-screen.png",
             "https://github.githubassets.com/images/modules/site/home/pr-description.png",
             "https://github.githubassets.com/images/modules/site/home/pr-comment.png",
@@ -169,23 +167,9 @@ response = requests.request("POST", url, headers=headers, data=payload)
             "https://github.githubassets.com/images/modules/site/home/community-readme-1.png",
             "https://github.githubassets.com/images/modules/site/home/community-readme-2.png",
             "https://github.githubassets.com/images/modules/site/home/icons/heart.svg",
-            "https://avatars.githubusercontent.com/sophshep?s=64&v=4",
-            "https://avatars.githubusercontent.com/pmarsceill?s=64&v=4",
             "https://github.githubassets.com/images/modules/site/home/community-sponsor-1.png",
             "https://github.githubassets.com/images/modules/site/home/community-sponsor-2.png",
             "https://github.githubassets.com/images/modules/site/home/footer-illustration.svg",
-            "https://avatars.githubusercontent.com/tensorflow?s=64&v=4",
-            "https://avatars.githubusercontent.com/gatsbyjs?s=64&v=4",
-            "https://avatars.githubusercontent.com/home-assistant?s=64&v=4",
-            "https://avatars.githubusercontent.com/rust-lang?s=64&v=4",
-            "https://avatars.githubusercontent.com/flutter?s=64&v=4",
-            "https://avatars.githubusercontent.com/kubernetes?s=64&v=4",
-            "https://avatars.githubusercontent.com/apple?s=64&v=4",
-            "https://avatars.githubusercontent.com/ansible?s=64&v=4",
-            "https://avatars.githubusercontent.com/hashicorp?s=64&v=4",
-            "https://avatars.githubusercontent.com/ohmyzsh?s=64&v=4",
-            "https://avatars.githubusercontent.com/facebook?s=64&v=4",
-            "https://avatars.githubusercontent.com/npm?s=64&v=4",
             "https://github.githubassets.com/images/modules/site/icons/footer/github-logo.svg",
             "https://github.githubassets.com/images/modules/site/icons/footer/twitter.svg",
             "https://github.githubassets.com/images/modules/site/icons/footer/facebook.svg",
@@ -193,7 +177,6 @@ response = requests.request("POST", url, headers=headers, data=payload)
             "https://github.githubassets.com/images/modules/site/icons/footer/linkedin.svg",
             "https://github.githubassets.com/images/modules/site/icons/footer/github-mark.svg"
         ],
-        "screenshot": "omitted base64 encoded image (see below)",
         "url": "https://github.com/",
         "title": "GitHub: Where the world builds software",
         "siteName": "GitHub",
