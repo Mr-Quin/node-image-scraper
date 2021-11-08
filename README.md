@@ -108,6 +108,32 @@ print(response.text)
 ```
 </details>
 
+<details>
+    <summary>JS Fetch</summary>
+    
+```javascript
+var myHeaders = new Headers();
+myHeaders.append("Content-Type", "application/json");
+
+var raw = JSON.stringify({
+  "url": "https://github.com",
+  "scrapeImages": true
+});
+
+var requestOptions = {
+  method: 'POST',
+  headers: myHeaders,
+  body: raw,
+  redirect: 'follow'
+};
+
+fetch("http://.../", requestOptions)
+  .then(response => response.text())
+  .then(result => console.log(result))
+  .catch(error => console.log('error', error));
+```
+</details>
+
 **Response:**
 
 <details>
