@@ -1,5 +1,3 @@
-import { chromium } from 'playwright'
-import { headless } from '../config.js'
 import { tryCatch } from './util.js'
 import { browser } from '../index.js'
 
@@ -78,11 +76,13 @@ export const scraper = async (url, opts = {}) => {
 
         const tasks = []
 
-        tasks.push(screenshotPage(page))
+        
+        // sequential tasks
+        if (opts.scrapeImages) tasks.push(await extractImages(page))
+        
+        const screenshot = await screenshotPage(page)
 
-        if (opts.scrapeImages) tasks.push(extractImages(page))
-
-        const [screenshot, images] = await Promise.all(tasks)
+        const [images] = tasks
 
         const scrapedImages = images?.map(resolvePath(url)).filter(isImage) ?? []
 

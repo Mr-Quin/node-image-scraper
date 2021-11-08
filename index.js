@@ -3,6 +3,7 @@ import { scraper } from './src/scrape.js'
 import { getLinkPreview } from 'link-preview-js'
 import { tryCatch } from './src/util.js'
 import { chromium } from 'playwright'
+import {headless} from './config.js'
 
 const app = express()
 const port = process.env.PORT || 3000
@@ -44,11 +45,15 @@ const entry = async (req, res) => {
     const opts = scrapeImages === true || scrapeImages === 'true' ? { scrapeImages: true } : {}
     const scrape = await scraper(url, opts)
 
-    const [scrapedData, scrapeErr] = await tryCatch(scrape.scrape, scrape.close)
+    // start getting meta data before scraper
+    const metaPromise = getMeta(url)
 
+    const [scrapedData, scrapeErr] = await tryCatch(scrape.scrape, scrape.close)
+    
     if (scrapeErr) throw scrapeErr
 
-    const metadata = await getMeta(url)
+    // wait for metadata to return
+    const metadata = await metaPromise
 
     return res.json({ data: { ...scrapedData, ...metadata }, msg: 'success' })
 }
@@ -61,6 +66,6 @@ app.use((err, req, res, next) => {
 })
 
 // keep browser instance open
-export const browser = await chromium.launch({ headless: false })
+export const browser = await chromium.launch({ headless })
 
 app.listen(port, () => console.log(`Listening on port ${port}`))
