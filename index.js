@@ -7,6 +7,16 @@ import { chromium } from 'playwright'
 const app = express()
 const port = process.env.PORT || 3000
 
+// logs the ip of the requester
+const logRequest = (req, res, next) => {
+    console.log(
+        `${req.ip} requested ${req.url} with query ${JSON.stringify(
+            req.query
+        )} and body ${JSON.stringify(req.body)}`
+    )
+    next()
+}
+
 const getMeta = async (url) => {
     return getLinkPreview(url, { headers: { 'User-Agent': 'googlebot', timeout: 1000 } })
 }
@@ -26,10 +36,10 @@ const allowPost = (req, res, next) => {
 app.use(express.urlencoded({ extended: true }))
     .use(express.json())
     .use(allowPost)
+    .use(logRequest)
 
 const entry = async (req, res) => {
     const { url, scrapeImages } = req.body
-    console.log(`Received ${url}`)
 
     const opts = scrapeImages === true || scrapeImages === 'true' ? { scrapeImages: true } : {}
     const scrape = await scraper(url, opts)
