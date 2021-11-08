@@ -1,6 +1,7 @@
 import { chromium } from 'playwright'
 import { headless } from '../config.js'
 import { tryCatch } from './util.js'
+import { browser } from '../index.js'
 
 const resolvePath = (url) => (path) => new URL(path, url).href
 
@@ -18,14 +19,13 @@ const isImage = (link) => {
     return imageRegex.test(link)
 }
 
-const openBrowser = async () => {
-    const browser = await chromium.launch()
+const openPage = async () => {
     const page = await browser.newPage({
         viewport: { width: 1680, height: 1050 },
         userAgent:
             'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.132 Safari/537.36',
     })
-    return { browser, page }
+    return page
 }
 
 const screenshotPage = async (page) => {
@@ -58,11 +58,10 @@ const extractImages = async (page, url, opts = { timeout: 3000 }) => {
 
 export const scraper = async (url, opts = {}) => {
     console.log(`Starting scraper with url ${url} and options ${JSON.stringify(opts)}`)
-    const { browser, page } = await openBrowser()
+    const page = await openPage()
 
     const close = async () => {
-        await page.close()
-        await browser.close()
+        page.close()
     }
 
     const scrape = async () => {
@@ -87,7 +86,7 @@ export const scraper = async (url, opts = {}) => {
 
         const scrapedImages = images?.map(resolvePath(url)).filter(isImage) ?? []
 
-        await browser.close()
+        await close()
 
         return { screenshot, scrapedImages }
     }

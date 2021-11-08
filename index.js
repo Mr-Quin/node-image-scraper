@@ -2,6 +2,7 @@ import express from 'express'
 import { scraper } from './src/scrape.js'
 import { getLinkPreview } from 'link-preview-js'
 import { tryCatch } from './src/util.js'
+import { chromium } from 'playwright'
 
 const app = express()
 const port = process.env.PORT || 3000
@@ -30,7 +31,7 @@ const entry = async (req, res) => {
     const { url, scrapeImages } = req.body
     console.log(`Received ${url}`)
 
-    const opts = scrapeImages === 'true' ? { scrapeImages: true } : {}
+    const opts = scrapeImages === true || scrapeImages === 'true' ? { scrapeImages: true } : {}
     const scrape = await scraper(url, opts)
 
     const [scrapedData, scrapeErr] = await tryCatch(scrape.scrape, scrape.close)
@@ -48,5 +49,8 @@ app.use((err, req, res, next) => {
     console.error(err)
     res.status(500).json({ msg: err.message })
 })
+
+// keep browser instance open
+export const browser = await chromium.launch({ headless: false })
 
 app.listen(port, () => console.log(`Listening on port ${port}`))
