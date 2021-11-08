@@ -3,7 +3,7 @@ import { scraper } from './src/scrape.js'
 import { getLinkPreview } from 'link-preview-js'
 import { tryCatch } from './src/util.js'
 import { chromium } from 'playwright'
-import {headless} from './config.js'
+import { headless } from './config.js'
 
 const app = express()
 const port = process.env.PORT || 3000
@@ -49,7 +49,7 @@ const entry = async (req, res) => {
     const metaPromise = getMeta(url)
 
     const [scrapedData, scrapeErr] = await tryCatch(scrape.scrape, scrape.close)
-    
+
     if (scrapeErr) throw scrapeErr
 
     // wait for metadata to return

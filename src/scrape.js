@@ -76,10 +76,9 @@ export const scraper = async (url, opts = {}) => {
 
         const tasks = []
 
-        
         // sequential tasks
         if (opts.scrapeImages) tasks.push(await extractImages(page))
-        
+
         const screenshot = await screenshotPage(page)
 
         const [images] = tasks
