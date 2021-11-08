@@ -43,7 +43,7 @@ The request body has following properties:
 Example request body:
 ```json
 {
-    "url": "some url",
+    "url": "https://google.com",
     "scrapeImages": "true"
 }
 ```
