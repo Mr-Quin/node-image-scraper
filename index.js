@@ -48,14 +48,16 @@ const entry = async (req, res) => {
     const scrape = await scraper(url, opts)
 
     // start getting meta data before scraper
-    const metaPromise = getMeta(url)
+    const metaPromise = await tryCatch(() => getMeta(url))
 
     const [scrapedData, scrapeErr] = await tryCatch(scrape.scrape, scrape.close)
 
     if (scrapeErr) throw scrapeErr
 
     // wait for metadata to return
-    const metadata = await metaPromise
+    const [metadata, err] = await metaPromise
+
+    if (err) throw err
 
     return res.json({ data: { ...scrapedData, ...metadata }, msg: 'success' })
 }
