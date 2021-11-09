@@ -1,4 +1,5 @@
 import express from 'express'
+import cors from 'cors'
 import { scraper } from './src/scrape.js'
 import { getLinkPreview } from 'link-preview-js'
 import { tryCatch } from './src/util.js'
@@ -34,10 +35,11 @@ const allowPost = (req, res, next) => {
     next()
 }
 
-app.use(express.urlencoded({ extended: true }))
+app.use(cors())
+    .use(express.urlencoded({ extended: true }))
+    .use(logRequest)
     .use(express.json())
     .use(allowPost)
-    .use(logRequest)
 
 const entry = async (req, res) => {
     const { url, scrapeImages } = req.body
@@ -66,6 +68,6 @@ app.use((err, req, res, next) => {
 })
 
 // keep browser instance open
-export const browser = await chromium.launch({ headless })
+export const browser = await chromium.launch({ headless: true })
 
 app.listen(port, () => console.log(`Listening on port ${port}`))
